@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENI — Liste Étudiants L2 GBD 2025-2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --surface: #131929;
+    --surface2: #1a2236;
+    --border: #2a3650;
+    --accent: #3b82f6;
+    --accent2: #60a5fa;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --highlight: #1e3a5f;
+    --found: #0f2a1a;
+    --found-border: #22c55e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  header {
+    background: linear-gradient(135deg, #0d1b35 0%, #091428 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 24px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    width: 400px; height: 200px;
+    background: radial-gradient(ellipse, rgba(59,130,246,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(59,130,246,0.15);
+    border: 1px solid rgba(59,130,246,0.4);
+    color: var(--accent2);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  h1 span { color: var(--accent2); }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .search-area {
+    max-width: 700px;
+    margin: 32px auto 0;
+    padding: 0 20px;
+  }
+
+  .search-wrap {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 16px;
+    color: var(--muted);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  #searchInput {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px 14px 44px;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  #searchInput:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  }
+
+  #searchInput::placeholder { color: var(--muted); }
+
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 7px 16px;
+    border-radius: 4px;
+    font-family: 'Sora', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--highlight);
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+
+  .stats {
+    max-width: 700px;
+    margin: 16px auto 0;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .stats .count { color: var(--accent2); font-weight: 700; }
+
+  main {
+    max-width: 900px;
+    margin: 24px auto 0;
+    padding: 0 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    background: var(--surface2);
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  thead th:first-child { width: 60px; text-align: center; }
+  thead th:nth-child(2) { width: 120px; }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(42,54,80,0.5);
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: rgba(59,130,246,0.05); }
+
+  tbody tr.match {
+    background: var(--found);
+    border-bottom: 1px solid rgba(34,197,94,0.2);
+  }
+
+  tbody tr.match td:nth-child(2) {
+    color: var(--found-border);
+    font-weight: 700;
+  }
+
+  td {
+    padding: 11px 16px;
+    font-size: 13.5px;
+  }
+
+  td:first-child {
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  td:nth-child(2) {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+  }
+
+  td:nth-child(3) { font-weight: 400; }
+
+  .cell-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .copy-button {
+    display: inline-grid;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    place-items: center;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color .15s, background .15s, border-color .15s;
+  }
+
+  .copy-button:hover, .copy-button:focus-visible {
+    border-color: var(--border);
+    outline: none;
+    background: var(--surface2);
+    color: var(--accent2);
+  }
+
+  .copy-button svg { width: 15px; height: 15px; }
+  .copy-button.copied { color: var(--found-border); }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+
+  .highlight-text {
+    background: rgba(251,191,36,0.3);
+    color: #fbbf24;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  .no-result {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .no-result .icon { font-size: 40px; margin-bottom: 12px; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 600px) {
+    td, th { padding: 9px 10px; font-size: 12px; }
+    td:nth-child(3) { font-size: 11.5px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">UNIVERSITE DE FIANARANTSOA</div>
+  <h1>École Nationale d'Informatique<br><span>L2 — Parcours GBD</span></h1>
+  <p class="subtitle">Liste des étudiants · Année universitaire 2025–2026 · 170 étudiants</p>
+</header>
+
+<div class="search-area">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Rechercher par N° INS ou nom et prénoms..." autocomplete="off" autofocus>
+  </div>
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="setFilter('all', this)">Tous</button>
+    <button class="filter-btn" onclick="setFilter('ins', this)">Par N° INS</button>
+    <button class="filter-btn" onclick="setFilter('name', this)">Par Nom</button>
+  </div>
+</div>
+
+<div class="stats">
+  <span>Résultats : <span class="count" id="countDisplay">170</span></span>
+  <span id="searchStatus"></span>
+</div>
+
+<main>
+  <span class="visually-hidden" id="copyStatus" role="status" aria-live="polite"></span>
+  <table id="studentTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>N° INS</th>
+        <th>Nom et Prénoms</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="no-result" id="noResult" style="display:none">
+    <div class="icon">🔎</div>
+    <div>Aucun étudiant trouvé pour cette recherche.</div>
+  </div>
+</main>
+
+<script>
+const students = [
+  [1, 3051, "RATSIMBAZAFY Andrianjakanirina"],
+  [2, 3125, "RASOLONDRAIBE Nomenjanahary Finiavana"],
+  [3, 3133, "RAKOTONDRAINIBE Kiady Ny Aina Juvénal"],
+  [4, 3144, "RANDRIANARINAIVO Vonjy Eli"],
+  [5, 3166, "ANJARATIANA Miaro Antra Itokiana"],
+  [6, 3188, "NOMENJANAHARY Marie Julia"],
+  [7, 3236, "DIADEMA ANDRIAMAHATSANGY No Ary Ny Tsiaro"],
+  [8, 3253, "N'HARISOA Razavamanjary Ricardo Carlos"],
+  [9, 3300, "RAKOTONARIVO Andy Emmanuel"],
+  [10, 3302, "AVOMIRANANDRO Misalotra Razanajatovo"],
+  [11, 3449, "RANDRIANTSIFERANA Jean Teddy"],
+  [12, 3450, "PAULARIS Vonjitahina Kevin Wesley Raoely"],
+  [13, 3451, "RASOLOFONIAINA Mintsa Sylvain"],
+  [14, 3453, "ANDRIAMANDIMBILAZA Fitokiantsoa"],
+  [15, 3454, "NAMBININTSOA Tahina Nancy"],
+  [16, 3456, "SAFIDINIRINA Antonio"],
+  [17, 3457, "RABESON Ny Aro Fifaliana Judickaël"],
+  [18, 3458, "RALAINORO Andriamantenaina Nandrianina"],
+  [19, 3459, "RASAMIMANANA Fenitra Ary Mihaja"],
+  [20, 3460, "RAKOTONJANAHARY Navalontsoa Nomena"],
+  [21, 3461, "ANDRIANJOHANY Narindraniaina Alinot"],
+  [22, 3462, "NIRINARISOA Fanantenana"],
+  [23, 3465, "RALAHIKOA Levy Clément"],
+  [24, 3468, "RAHARIJAONA Anjaranomenjanahary Laydjah Hassad"],
+  [25, 3469, "RAMAHANDRISOA Diamondra Patricia"],
+  [26, 3474, "RANDRIANIRINA Volaniaina"],
+  [27, 3477, "ANDRIANARIVO Lalaina Bienvenu"],
+  [28, 3478, "RAHARIVONY Henintsoa Arnica"],
+  [29, 3480, "RAKOTOARIMANANA Thijy Gilberto"],
+  [30, 3481, "TSIREFESIMANDIMBY Ange Barthelemeo"],
+  [31, 3483, "RAKOTOHAVANA Hasinjaka Hobiana"],
+  [32, 3484, "RAZAFIMANDIMBY Ambinintsoa Kevin"],
+  [33, 3488, "BOBA Elleinsteine Nanne Nirvana"],
+  [34, 3491, "RAKOTONDRAJAONA Nomena Ny Fahasoavana"],
+  [35, 3492, "TAUFICK Mampitohy Mamy"],
+  [36, 3494, "RASOLOFONOMENIAVO Manjakarivony Volitiana"],
+  [37, 3498, "RALAIZANAKA Heritiana Mickaella"],
+  [38, 3499, "ANDRIANARISOA Aina Fy Haritra"],
+  [39, 3500, "MAHATANA Volatiana Yannicka"],
+  [40, 3502, "ANDRIAMANANJARA Rianala Masinjaka"],
+  [41, 3503, "RAMIHONE Jeannette Soafy"],
+  [42, 3505, "RANDRIANARISOA Lovaniaina Eddy"],
+  [43, 3511, "ANDRIAFANIRINOMENJANAHARY Marianno Albertholdinho"],
+  [44, 3512, "RAMANANT'HAJA Naurah Elisoa"],
+  [45, 3513, "RANDRIAMALAZAHERY Angelas Fanie"],
+  [46, 3519, "ANDRIAMANANTENA Sahaza Omentsoa"],
+  [47, 3520, "ANDRIANTAVY Marie Sarobidy Tsihafoy"],
+  [48, 3521, "ALEGNE Jeanel Zazio"],
+  [49, 3524, "TINJANAHARY Mihaso"],
+  [50, 3525, "RAKOTONDRABE Idealiarimiora Maurilla"],
+  [51, 3527, "RAZAFIMANDIMBY Naveloniaina Kevin"],
+  [52, 3528, "RANORONJATOVO Tina Julia"],
+  [53, 3530, "MAROLAHY Jessica Maimoona"],
+  [54, 3531, "RANDRIANARISON Kanto Iriantsoa"],
+  [55, 3534, "ANDRIANTSIRESY Ny Sanda Fenohasina"],
+  [56, 3537, "DIMBIALIJAONA Ifaliana Sandrinah"],
+  [57, 3538, "RABIAHARISON Njaratiana Elvia"],
+  [58, 3539, "RAMANANTSILEONIVA Andriambololontsoa"],
+  [59, 3541, "RANDRIANANTENAINA Christinah Fabienne"],
+  [60, 3546, "RASOARIMANANA Mich Hasy Fitahiana"],
+  [61, 3548, "RASOAMIARAMANANA Rina Julien"],
+  [62, 3549, "ANDRIAMAHOLY Tinaniaiana"],
+  [63, 3550, "RAHASIMANARIVO Mankasitraka Lucino"],
+  [64, 3551, "ANDRIAHASIMBOLA Rojoniaina Valimbavaka"],
+  [65, 3552, "LAHATRINIAVO Marelia Volatsiky"],
+  [66, 3553, "RAKOTOARIMANANA Mialinirina Clovis Abel"],
+  [67, 3555, "RALAIASY Timoty Fifaliana"],
+  [68, 3557, "RANDRIAMAMPIANINA Mamy"],
+  [69, 3563, "MANANJARA Jean Philiastre"],
+  [70, 3564, "RANDRIAMIHARISOA Miorahasina"],
+  [71, 3566, "NAMBININJANAHARY Angela"],
+  [72, 3567, "RATSIMBAZAFY Volahanta Prisca"],
+  [73, 3571, "RANDRIANANTENAINA Mahafinaritra Lahiniriko"],
+  [74, 3574, "HERINJAINA Jean Aime"],
+  [75, 3575, "RAKOTONIRINA Nambinintsoa Lala Chancielo Todisoa"],
+  [76, 3576, "RAHERIMANINA Anjarasoa Sarobidy Mitianah"],
+  [77, 3578, "ANDRIAMAHAIMIZAKA Iriantsoa Tsiory Lalaina"],
+  [78, 3581, "ZONANTENAINTSOA Tanjona Matthieu"],
+  [79, 3582, "ANDRIANANTENAINA Fanomezantsoa Hobiniaina Francia Elodie"],
+  [80, 3583, "DANIELSON Nisi Andrianirina"],
+  [81, 3584, "NOMENJANAHARY Northa Yorniah"],
+  [82, 3585, "VOLA Espérencia"],
+  [83, 3586, "RAHANTAMALALA Monica"],
+  [84, 3588, "RASOLOARINJANAHARY Henintsoa Eloi"],
+  [85, 3589, "NY AINA RAVELOSON Fanilo"],
+  [86, 3591, "ANDRIATIANARIVO Antsa Mendrikaja"],
+  [87, 3594, "RANDRIAMAROMANANA Tsiry Anderson"],
+  [88, 3595, "SAMBAZAFY Germaine Choisine"],
+  [89, 3598, "AVOTRA Nomenjanahary Sedrampiainana Edion Franco"],
+  [91, 3601, "HERIMAMPIONONA Sylvio"],
+  [92, 3602, "TAFENO Anicet Florent"],
+  [93, 3603, "RAMANANJATOVO Rivo Lalaniaina"],
+  [94, 3604, "SHANJEEV Randriantahiana Wendo Marius"],
+  [95, 3608, "RAKOTONDRANIVO Rasoloarisata Tolojanahary Rogélio"],
+  [96, 3609, "ANDRIAMAROSOA Ahefa Ny Andry Fitokiana"],
+  [97, 3610, "VONIARIJAONA Rojomanantsoa Aina Lamitsiiva"],
+  [98, 3611, "ANDRIAMAHANDRY Heriniaina Marie Sylvia"],
+  [99, 3613, "RAHENINTSOA Faramalala Emilienne"],
+  [100, 3614, "MORA Riccardo Jason"],
+  [101, 3615, "RAZAFINDRAZAKA Rivohery Fanasina"],
+  [102, 3616, "RAKOTOARIVELO Fy Hasin'Ala Princia"],
+  [103, 3617, "ANDRIAMIALISOA Antsa Ny Aina Johanesa"],
+  [104, 3619, "RAKOTOARINELINA Lazanirina Michaël"],
+  [105, 3621, "RANDRIANIRINA Diary Harinjaka"],
+  [106, 3622, "VOCA Jeffrey Gérald"],
+  [107, 3624, "HERIMPITIA Noharinjanahary Éditin Angeli"],
+  [108, 3625, "IRIMAHASOA Voaharimanitra"],
+  [109, 3628, "WELL-TENA Benay Body"],
+  [110, 3632, "ANDRIAMALAZAONY Ludovic Elysée"],
+  [111, 3638, "RABEMANANTSOA Geoffroy Dimitri"],
+  [112, 3641, "RAFANOMEZANTSOA Alisoa Christina"],
+  [113, 3644, "RAHERNIAINA Nomenjanahary Olivier"],
+  [114, 3646, "MONJA SITRAKY NY AVO Mbolatiana Tsioriniaina Stephan"],
+  [115, 3647, "RADINIRINA Salohy Maminiaina"],
+  [116, 3649, "ANDRIANIRINA Zo Ny Andrianina Hajatiana Fabrice"],
+  [117, 3652, "RALAIVAO Heliarisin Claudius"],
+  [118, 3654, "HERIMALALA TOKIFIONONANA Jenny"],
+  [119, 3656, "HERITINA Arinarivo Nelson"],
+  [120, 3659, "ITOKIANJANAHARY Vatosoa Ismaël"],
+  [121, 3661, "RAMAMONJISOA Yves Landris"],
+  [122, 3665, "ANDRIANARIVO Kevin Cazal"],
+  [123, 3668, "RAMAROMANGA Heriniaina Hervé"],
+  [124, 3669, "RAZAFIMAHATRATRA Jean Bosco Chridys"],
+  [125, 3671, "ANDRIAMAROLAHY Mamisoa Sandro"],
+  [126, 3676, "RAKOTONIRAINY Aina Nirina Patricia"],
+  [127, 3677, "RAKOTONINDRAINY Miarina Nekena Heleno"],
+  [128, 3678, "RAKOTONARIVO Tonny Lucas"],
+  [129, 3679, "RALAHY Heriniaina Joshua Yoan"],
+  [130, 3680, "RAZANATSIMBA Jud Andriamasinkaja"],
+  [131, 3686, "BEBE Tahinjanahary Justiannah"],
+  [132, 3687, "BROUETTE Adriano Davidson"],
+  [133, 3691, "MINTSANIRINA Wendy"],
+  [134, 3693, "AVO NY AINA Henintsoa Albertina"],
+  [135, 3694, "RALAIARINORO Tokiniaina Stephano Lucien"],
+  [136, 3695, "RABEARIVELO Hanitrimaima Noëlla Aimée"],
+  [137, 3697, "RAHARINONY Marie Noëlla"],
+  [138, 3699, "RAJAONARIVO Orlando Nantenaina"],
+  [139, 3701, "RALAIVAO Manitriniaina Lario"],
+  [140, 3702, "ANDRIANARISON Ferdino"],
+  [141, 3705, "RABOTOMANASA Ny Aina Rey Leansa"],
+  [142, 3707, "RANDRIANJAFY Mirantsoa Danny"],
+  [143, 3710, "RAVELOJAONA Hajaniaina Johnny"],
+  [144, 3711, "RAKOTOARIMANANA Faramalala Alix"],
+  [145, 3712, "RAVELOSOA Faranirina Christinah Juvenal"],
+  [146, 3716, "NOMENJANAHARY Henintsoa Joliot Kevin"],
+  [147, 3717, "NANTENAINA François"],
+  [148, 3719, "RAHARISOA Zafinirina Solange"],
+  [149, 3720, "MIREILLE Lucia"],
+  [150, 3732, "RAKOTOSEHENO Weismann Benhur"],
+  [151, 3734, "RAMAJO Niekena Miangaly"],
+  [152, 3735, "MALALANIAINA Christynah Jeda"],
+  [153, 3740, "DERALAZA Vincent Dinart"],
+  [154, 3748, "RATIANANDRASANA Vonimiadana Adèle Miaura"],
+  [155, 3752, "RAVELOMANANA Tiavina Ambinintsoa"],
+  [156, 3753, "RANDRIAMBELOSON Mahaleoharitsito Fehizoro"],
+  [157, 3754, "ANDRIANTSOA Jédie Willah"],
+  [158, 3755, "ANDRIAHERINTSOA Nasandratriniaina"],
+  [159, 3756, "MIRANTSOA Malala Navalona"],
+  [160, 3760, "RAKOTOARISOA Narovaniavo Victorine"],
+  [161, 3766, "RAKOTOMALALARINTSOA Tsanta Fiderana"],
+  [162, 3767, "NESY Guillaume"],
+  [163, 3771, "HERIMANANJARA Zo Arhus"],
+  [164, 3772, "ANDRIAMANANTENA Sandaniaina Mamy Fandresena"],
+  [165, 3775, "ANDRIAMANGANORO Vahatra Hasambarana"],
+  [166, 3776, "RAZAFIMAHATRATRA Fanomezantsoa Antoine"],
+  [167, 3779, "RAZAFIMANDIMBY Dimitri Joseph"],
+  [168, 3781, "FITIAVANA Mihantaniaina Dinasoa Prisca"],
+  [169, 3782, "FANAMBINANTSOA Heritiana Pernet"],
+  [170, 3786, "RAKOTONDRAMANITRA Andrianavalony Maminiaina"],
+];
+
+let currentFilter = 'all';
+let currentQuery = '';
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  doSearch();
+}
+
+function highlight(text, query) {
+  if (!query) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const safeText = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return safeText.replace(new RegExp(`(${escaped})`, 'gi'), '<span class="highlight-text">$1</span>');
+}
+
+function escapeHtml(text) {
+  return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+const copyIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" stroke="currentColor" stroke-width="1.7"/></svg>';
+const copiedIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      // Use the legacy copy command if clipboard permissions are unavailable.
+    }
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand('copy');
+  textarea.remove();
+  if (!copied) throw new Error('Le navigateur a refusé la copie.');
+}
+
+document.getElementById('tableBody').addEventListener('click', async event => {
+  const button = event.target.closest('.copy-button');
+  if (!button) return;
+
+  const status = document.getElementById('copyStatus');
+  try {
+    await copyText(button.dataset.copy);
+    button.classList.add('copied');
+    button.innerHTML = copiedIcon;
+    button.setAttribute('aria-label', 'Copié');
+    status.textContent = button.dataset.copyType === 'ins' ? 'Matricule copié.' : 'Nom copié.';
+    window.setTimeout(() => {
+      button.classList.remove('copied');
+      button.innerHTML = copyIcon;
+      button.setAttribute('aria-label', `Copier ${button.dataset.copyType === 'ins' ? 'le matricule' : 'le nom'} ${button.dataset.copy}`);
+    }, 1200);
+  } catch {
+    status.textContent = 'Copie impossible. Vérifiez les autorisations du navigateur.';
+  }
+});
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  currentQuery = q;
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  let count = 0;
+
+  students.forEach(([num, ins, name]) => {
+    const insStr = String(ins);
+    let match = false;
+
+    if (!q) {
+      match = true;
+    } else if (currentFilter === 'ins') {
+      match = insStr.includes(q);
+    } else if (currentFilter === 'name') {
+      match = name.toLowerCase().includes(q);
+    } else {
+      match = insStr.includes(q) || name.toLowerCase().includes(q);
+    }
+
+    if (match) {
+      count++;
+      const tr = document.createElement('tr');
+      if (q) tr.classList.add('match');
+      tr.innerHTML = `
+        <td>${num}</td>
+        <td><div class="cell-content">${highlight(insStr, q)}<button class="copy-button" type="button" data-copy-type="ins" data-copy="${insStr}" aria-label="Copier le matricule ${insStr}" title="Copier le matricule">${copyIcon}</button></div></td>
+        <td><div class="cell-content">${highlight(name, q)}<button class="copy-button" type="button" data-copy-type="name" data-copy="${escapeHtml(name)}" aria-label="Copier le nom ${escapeHtml(name)}" title="Copier le nom">${copyIcon}</button></div></td>
+      `;
+      tbody.appendChild(tr);
+    }
+  });
+
+  document.getElementById('countDisplay').textContent = count;
+  document.getElementById('noResult').style.display = count === 0 ? 'block' : 'none';
+  document.querySelector('table').style.display = count === 0 ? 'none' : '';
+  document.getElementById('searchStatus').textContent = q ? `pour "${q}"` : '';
+}
+
+document.getElementById('searchInput').addEventListener('input', doSearch);
+doSearch();
+</script>
+</body>
+</html>
